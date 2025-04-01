@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-
 #include "thread_manager.h"
 #include "hash_table.h"
 #include "linked_list.h"
@@ -24,6 +23,8 @@ int main(){
   }
 
   // initalize hash linked list and thread manager 
+  init_hashtable();
+  init_thread_manager(thread_count);
 
   //reader-writer lock for the function to use while executing commands
   //all threads should share this one lock. When they try to do an insert or a delete they should try to acquire the writelock. When they do a search they should acquire the readlock
@@ -33,14 +34,15 @@ int main(){
   // get rest of commands 
   while (fgets(first, sizeof(first), input)) {
     char *cmd = strdup(first);
-    enqueue_command(cmd); // would be in thread_manager
+    enqueue_command(cmd);
   }
 
   // start threads -- thread_manager 
+  start_threads();
 
   // print output 
   output_final();
-
+  
   fclose(input); // close file
   return 0;
 }

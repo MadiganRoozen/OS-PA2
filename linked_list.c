@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <thread_manager.h>
-#include <hash_table.h>
-#include <linked_list.h>
-#include <rw_lock.h>
-#include <output.h>
+#include "thread_manager.h"
+#include "hash_table.h"
+#include "linked_list.h"
+#include "rw_lock.h"
+#include "output.h"
 
 // Create a new node
 hashRecord* create_node(uint32_t hash, const char* name, uint32_t salary) {
@@ -41,18 +41,6 @@ hashRecord* list_insert(hashRecord* head, uint32_t hash, const char* name, uint3
         curr->salary = salary;
         return head;
     }
-
-    hashRecord* new_node = create_node(hash, name, salary);
-
-    if (!prev) {
-        new_node->next = head;
-        return new_node;
-    }
-
-    prev->next = new_node;
-    new_node->next = curr;
-    return head;
-}
 
     hashRecord* new_node = create_node(hash, name, salary);
 

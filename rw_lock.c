@@ -2,18 +2,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
-
-#include <thread_manager.h>
-#include <hash_table.h>
-#include <linked_list.h>
-#include <rw_lock.h>
-#include <output.h>
-
-typedef struct rwlock_t {
-    sem_t writelock;
-    sem_t lock;
-    int num_readers;
-} rwlock_t;
+#include "thread_manager.h"
+#include "hash_table.h"
+#include "linked_list.h"
+#include "rw_lock.h"
+#include "output.h"
 
 //set up the lock with no readers and a semaphore for each lock and writelock
 void rwlock_init(rwlock_t *lock) {
@@ -33,7 +26,7 @@ void rwlock_acquire_readlock(rwlock_t *lock) {
 }
 
 void rwlock_release_readlock(rwlock_t *lock) {
-    Sem_wait(&lock->lock);
+    sem_wait(&lock->lock);
     lock->num_readers--;
 
     if (lock->num_readers == 0)

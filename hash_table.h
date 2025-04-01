@@ -1,3 +1,4 @@
+#include <stdint.h>
 
 typedef struct hash_struct
 {
@@ -11,4 +12,4 @@ int hash_insert(int key, hashRecord value);
 
 int hash_delete(int key);
 
-hashRecord hash_search(int key);
+hashRecord *hash_search(int key);

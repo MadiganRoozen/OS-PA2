@@ -1,20 +1,23 @@
 #include <stdio.h>
-#include <thread_manager.h>
-#include <hash_table.h>
-#include <linked_list.h>
-#include <rw_lock.h>
-#include <output.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include "thread_manager.h"
+#include "hash_table.h"
+#include "linked_list.h"
+#include "rw_lock.h"
+#include "output.h"
 
-typedef struct hash_struct
-{
-  uint32_t hash;
-  char name[50];
-  uint32_t salary;
-  struct hash_struct *next;
-} hashRecord;
+#define HASH_TABLE_SIZE 5000
 
 rwlock_t table_lock;  // Global read-write lock for synchronization
-hashRecord *hash_table[HASH_TABLE_SIZE] = {NULL};  // Hash table array
+hashRecord *hash_table[HASH_TABLE_SIZE];
+
+void init_hashtable(){
+  for(int i=0; i<HASH_TABLE_SIZE; i++){
+    hash_table[i] = NULL; // initalize 
+  }
+}
 
 uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
   size_t i = 0;

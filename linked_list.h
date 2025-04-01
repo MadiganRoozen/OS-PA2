@@ -1,7 +1,5 @@
-
 #include <stdint.h>
 #include <stdio.h>
-#include <hash_table.h> 
 
 hashRecord* list_insert(hashRecord* head, uint32_t hash, const char* name, uint32_t salary);
 hashRecord* list_delete(hashRecord* head, uint32_t hash);

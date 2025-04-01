@@ -33,7 +33,7 @@ long get_time(){
 void output_write_command(char* cmd, char* name, int salary){
 
     int time = get_time();
-    fprintf(output, "%ld,%s,%s,%d\n", time, cmd, name, salary);
+    fprintf(output, "%d,%s,%s,%d\n", time, cmd, name, salary);
     fflush(output);
 
 }
@@ -41,7 +41,7 @@ void output_write_command(char* cmd, char* name, int salary){
 // write out when locks are acquired + released
 void output_lock_status(char* status){
     int time = get_time();
-    fprintf(output, "%ld,%s\n", time, status);
+    fprintf(output, "%d,%s\n", time, status);
     fflush(output);
 
     // count the lock statuses for later 
@@ -56,7 +56,7 @@ void output_lock_status(char* status){
 // write out when an operation is waiting on a CV  + when it's signaling
 void output_condition_variables(char* signal){
     int time = get_time();
-    fprintf(output, "%ld,%s\n", time, signal);
+    fprintf(output, "%d,%s\n", time, signal);
     fflush(output);
 }
 
@@ -67,10 +67,12 @@ void output_final(){
     fprintf(output, "Number of lock releases: %d\n", lock_releases);
 
     // list of records sorted by hash values 
-    //hashRecord* records = sorted_table(); // from hash_table.h
+    hashRecord* records = sorted_table(); 
+    while (records) {
+        fprintf(output, "%ld,%s,%d", records->hash, records->name, records->salary);
+        records = records->next;
+    } 
 
-    // while (records) {
-    //     fprintf(output, "%ld,%s,%d", )
-    // } 
+    fclose(output);
 
 }
