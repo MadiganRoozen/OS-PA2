@@ -1,8 +1,20 @@
 #include <stdint.h>
 #include <stdio.h>
 
-hashRecord* list_insert(hashRecord* head, uint32_t hash, const char* name, uint32_t salary);
-hashRecord* list_delete(hashRecord* head, uint32_t hash);
-hashRecord* list_search(hashRecord* head, uint32_t hash);
-void list_print(FILE* file, hashRecord* head);
+typedef struct list{
+    node *head;
+} linked_list;
 
+typedef struct node {
+    hashRecord *record;   
+    struct node *next;   
+} node;
+
+node* create_node(hashRecord* rec);
+node* list_insert(node* new);
+node* list_delete(node* to_delete);
+node* list_search(uint32_t hash);
+void list_print(FILE* file, hashRecord* head);
+node* list_sort();
+
+extern linked_list list;

@@ -67,10 +67,10 @@ void output_final(){
     fprintf(output, "Number of lock releases: %d\n", lock_releases);
 
     // list of records sorted by hash values 
-    hashRecord* records = sorted_table(); 
-    while (records) {
-        fprintf(output, "%ld,%s,%d", records->hash, records->name, records->salary);
-        records = records->next;
+    node* curr = list.head;
+    while (curr) {
+        fprintf(output, "%ld,%s,%d", curr->record->hash, curr->record->name, curr->record->salary);
+        curr = curr->next;
     } 
 
     fclose(output);
