@@ -26,7 +26,7 @@ node* create_node(hashRecord* rec) {
 node* list_insert(node* new) {
     node* curr = list.head;
     //make the new node the head if there is not a head already
-    if(curr = NULL){
+    if(curr == NULL){
         list.head = curr;
         return list.head;
     }

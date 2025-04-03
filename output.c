@@ -69,7 +69,7 @@ void output_final(){
     // list of records sorted by hash values 
     node* curr = list.head;
     while (curr) {
-        fprintf(output, "%ld,%s,%d", curr->record->hash, curr->record->name, curr->record->salary);
+        fprintf(output, "%d,%s,%d", curr->record->hash, curr->record->name, curr->record->salary);
         curr = curr->next;
     } 
 

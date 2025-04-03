@@ -1,14 +1,14 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef struct list{
-    node *head;
-} linked_list;
-
 typedef struct node {
     hashRecord *record;   
     struct node *next;   
 } node;
+
+typedef struct list{
+    node *head;
+} linked_list;
 
 node* create_node(hashRecord* rec);
 node* list_insert(node* new);

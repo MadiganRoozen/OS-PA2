@@ -59,7 +59,7 @@ int hash_insert(int key, hashRecord value) {
   hash_table[hash] = new_record;
   
   rwlock_release_writelock(&table_lock);
-  list_insert(create_node(&new_record));
+  list_insert(create_node(new_record));
   return 0;  // Inserted new entry
 }
 
