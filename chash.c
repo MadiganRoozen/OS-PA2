@@ -6,14 +6,20 @@
 #include "rw_lock.h"
 #include "output.h"
 
-int main(){
-  // read in commands 
-  FILE *input = fopen("commands.txt", "r");
+int main(int argc, char *argv[]){
 
-  // just in case file is not there
-  if(input == NULL){
-    printf("'commands.txt' not Found");
+  char* filename = argv[1];
+  if(argc > 2){
+    printf("Usage: must include executable and input file");
+    return 0;
   }
+  // just in case file is not there
+  if(filename == NULL){
+    printf("Must include 'commands.txt'");
+    return 0;
+  }
+  // read in commands 
+  FILE *input = fopen(filename, "r");
 
   // read in number of threads -- first line 
   char first[20];
