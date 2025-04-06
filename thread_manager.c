@@ -12,9 +12,9 @@
 extern void execute_commands(char *command);
 
 // Global variables for managing the command queue.
-static char **command_array = NULL;  // Array of command strings.
-static int command_count = 0;        // How many commands have been enqueued.
-static int total_commands = 0;       // Total number of commands, already shown in the first line 
+static char **command_array = NULL;  
+static int command_count = 0;      
+static int total_commands = 0;      
 
 // Initialize the thread manager by allocating an array to hold the commands
 void init_thread_manager(int total) {
