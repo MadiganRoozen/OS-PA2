@@ -13,12 +13,14 @@ typedef struct list{
   hashRecord *head;
 } hash_table;
 
+extern hash_table list;
+
 void init_hashtable();
 
 uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length);
 
 int hash_insert(char* key, uint32_t value);
 
-int hash_delete(int key);
+int hash_delete(char* key);
 
-hashRecord *hash_search(int key);
+hashRecord *hash_search(char* key);

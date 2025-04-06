@@ -4,7 +4,6 @@
 #include <string.h>
 #include "thread_manager.h"
 #include "hash_table.h"
-#include "linked_list.h"
 #include "rw_lock.h"
 #include "output.h"
 
@@ -15,19 +14,6 @@ void init_hashtable(){
   list.head = NULL;
 }
 
-hashRecord* create_record(uint32_t hash, char* key, uint32_t value){
-  hashRecord *new_record = (hashRecord *)malloc(sizeof(hashRecord));
-  if (!new_record) {
-    rwlock_release_writelock(&table_lock);
-    return -1;  // Memory allocation failure
-  }
-  new_record->hash = hash;
-  strncpy(new_record->name, key, sizeof(new_record->name) - 1);
-  new_record->name[sizeof(new_record->name) - 1] = '\0';
-  new_record->salary= value;
-  new_record->next = NULL; 
-  return new_record;
-}
 
 uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
   size_t i = 0;
@@ -43,6 +29,21 @@ uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
   return hash;
 }
 
+//not messing with the list, does not need to lock directly
+hashRecord* create_record(uint32_t hash, char* key, uint32_t value){
+  hashRecord *new_record = (hashRecord *)malloc(sizeof(hashRecord));
+
+  if (!new_record) {
+    return NULL;  // Memory allocation failure
+  }
+  new_record->hash = hash;
+  strncpy(new_record->name, key, sizeof(new_record->name) - 1);
+  new_record->name[sizeof(new_record->name) - 1] = '\0';
+  new_record->salary= value;
+  new_record->next = NULL; 
+  return new_record;
+}
+
 //Im not sure the locks need to go in here, i would put them in the thread manager
 int hash_insert(char* key, uint32_t value) {
   //calc has value using key (which is the string name)
@@ -51,15 +52,36 @@ int hash_insert(char* key, uint32_t value) {
 
   if(cur == NULL){
     //make new node and make it the head
+    list.head = create_record(hash, key, value);
+    rwlock_release_writelock(&table_lock);
+    return 0;
   }
 
+  //try to find the record
   hashRecord *existing_record = hash_search(key);
 
   if(existing_record == NULL){
     //make new node and add it to the list
+    hashRecord* new = create_record(hash, key, value);
+    if(list.head->hash > new->hash){
+      hashRecord *old_head = list.head;
+      list.head = new;
+      new->next = old_head;
+      rwlock_release_writelock(&table_lock);
+      return 0;
+    }
+    while(cur->next->hash < new->hash || cur->next == NULL){
+      cur = cur->next;
+    }
+    hashRecord* old_next = cur->next;
+    cur->next = new;
+    new->next = old_next;
   }
   else{
-    //update the found record
+    //update the found record, only need to update the value
+    existing_record->salary = value;
+    rwlock_release_writelock(&table_lock);
+    return 0;
   }
 
   /*
@@ -73,40 +95,53 @@ int hash_insert(char* key, uint32_t value) {
     ptr = &((*ptr)->next);
   }
   */
+  rwlock_release_writelock(&table_lock);
   return 0;  // Inserted new entry
 }
 
-int hash_delete(int key) {
-  uint32_t hash = key % HASH_TABLE_SIZE;
+int hash_delete(char* key) {
+  uint32_t hash = jenkins_one_at_a_time_hash((uint8_t*)key, strlen(key));
   rwlock_acquire_writelock(&table_lock);
-  
-  hashRecord **ptr = &hash_table[hash];
-  while (*ptr) {
-    if ((*ptr)->hash == hash) {
-      hashRecord *temp = *ptr;
-      *ptr = (*ptr)->next;
-      free(temp);
-      rwlock_release_writelock(&table_lock);
-      return 0;  // Successfully deleted
-    }
-    ptr = &((*ptr)->next);
+
+  hashRecord* cur = list.head;
+  //delete the head
+  if(list.head->hash == hash){
+    hashRecord* old_head = list.head;
+    list.head = list.head->next;
+    free(old_head);
+    rwlock_release_writelock(&table_lock);
+    return 0;
   }
+  while(cur != NULL && cur->next->hash < hash){
+    cur = cur->next;
+  }
+  if(cur == NULL || cur->next->hash != hash){
+    rwlock_release_writelock(&table_lock);
+    return -1; //nothing deleted
+  }
+  hashRecord * new_next = cur->next->next;
+  free(cur->next);
+  cur->next = new_next;
   
   rwlock_release_writelock(&table_lock);
-  return -1;  // Key not found
+  return 0;  
 }
 
-hashRecord *hash_search(int key) {
-  uint32_t hash = key % HASH_TABLE_SIZE;
+hashRecord *hash_search(char* key) {
+  uint32_t hash = jenkins_one_at_a_time_hash((uint8_t*)key, strlen(key));
   rwlock_acquire_readlock(&table_lock);
   
-  hashRecord *ptr = hash_table[hash];
-  while (ptr) {
-    if (ptr->hash == hash) {
-      rwlock_release_readlock(&table_lock);
-      return ptr;  // Found entry
-    }
-    ptr = ptr->next;
+  hashRecord* cur = list.head;
+  while(cur != NULL && cur->hash < hash){
+    cur = cur->next;
+  }
+  if(cur->hash == hash){
+    rwlock_release_readlock(&table_lock);
+    return cur; //found
+  }
+  else if(cur == NULL){
+    rwlock_release_readlock(&table_lock);
+    return NULL; //not found
   }
   
   rwlock_release_readlock(&table_lock);

@@ -5,7 +5,6 @@
 #include <pthread.h>
 #include "thread_manager.h"
 #include "hash_table.h"
-#include "linked_list.h"
 #include "rw_lock.h"
 #include "output.h"
 
@@ -36,7 +35,7 @@ long long get_time() {
 void output_write_command(char* cmd, char* name, int salary){
     pthread_mutex_lock(&output_lock);
     int time = get_time();
-    fprintf(output, "%ld,%s,%s,%d\n", time, cmd, name, salary);
+    fprintf(output, "%d,%s,%s,%d\n", time, cmd, name, salary);
     fflush(output);
     pthread_mutex_unlock(&output_lock);
 }
@@ -45,7 +44,7 @@ void output_write_command(char* cmd, char* name, int salary){
 void output_lock_status(char* status){
     pthread_mutex_lock(&output_lock);
     int time = get_time();
-    fprintf(output, "%ld,%s\n", time, status);
+    fprintf(output, "%d,%s\n", time, status);
     fflush(output);
     pthread_mutex_unlock(&output_lock);
 
@@ -62,7 +61,7 @@ void output_lock_status(char* status){
 void output_condition_variables(char* signal){
     pthread_mutex_lock(&output_lock);
     int time = get_time();
-    fprintf(output, "%ld,%s\n", time, signal);
+    fprintf(output, "%d,%s\n", time, signal);
     fflush(output);
     pthread_mutex_unlock(&output_lock);
 }
@@ -72,9 +71,9 @@ void print_table(){
     pthread_mutex_lock(&output_lock);
 
     // list of records sorted by hash values 
-    node* curr = list.head; 
+    hashRecord* curr = list.head; 
     while (curr) {
-        fprintf(output, "%d,%s,%d", curr->record->hash, curr->record->name, curr->record->salary);
+        fprintf(output, "%d,%s,%d", curr->hash, curr->name, curr->salary);
         curr = curr->next;
     } 
 

@@ -4,12 +4,8 @@
 #include <pthread.h>
 #include "thread_manager.h"
 #include "hash_table.h"
-#include "linked_list.h"
 #include "rw_lock.h"
 #include "output.h"
-
-// Help Perform the required hash table operations ? I didnt see it anywhere in our files
-extern void execute_commands(char *command);
 
 // Global variables for managing the command queue.
 static char **command_array = NULL;  // Array of command strings.
@@ -25,6 +21,11 @@ void init_thread_manager(int total) {
         exit(EXIT_FAILURE);
     }
     command_count = 0;
+}
+
+// Help Perform the required hash table operations ? I didnt see it anywhere in our files
+extern void execute_commands(char *command){
+    
 }
 
 // Enqueue a command string into the global command array.

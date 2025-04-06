@@ -1,7 +1,5 @@
 
-typedef struct{
-
-}p_thread_t;
+extern void execute_commands(char *command);
 
 extern void execute_commands(char *command);
 
