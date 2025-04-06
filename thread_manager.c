@@ -25,7 +25,7 @@ void init_thread_manager(int total) {
 
 
 
-// New function: execute_commands() now parses the command string and calls the corresponding hash table function.
+// parses the command string and calls the corresponding hash table function.
 void execute_commands(char *cmd) {
     char command[20], name[50];
     int salary;
@@ -71,10 +71,9 @@ void enqueue_command(char *command) {
     }
 }
 
-// Thread function: each thread processes one command.
 void *process_command(void *arg) {
     char *cmd = (char *)arg;
-    execute_commands(cmd); // call the execute_commands to allow the thread manager code to pass the work of interpreting each command. 
+    execute_commands(cmd); 
     return NULL;
 }
 
