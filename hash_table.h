@@ -4,8 +4,8 @@
 typedef struct hash_struct
 {
   uint32_t hash;
-  char name[50];
-  uint32_t salary;
+  char name[50]; //key
+  uint32_t salary; //value
   struct hash_struct *next;
 } hashRecord;
 

@@ -33,10 +33,30 @@ uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
   return hash;
 }
 
-int hash_insert(int key, hashRecord value) {
-  uint32_t hash = jenkins_one_at_a_time_hash((uint8_t*)value.name, strlen(value.name)) % HASH_TABLE_SIZE;
-  rwlock_acquire_writelock(&table_lock);
+//Im not sure the locks need to go in here, i would put them in the thread manager
+int hash_insert(char* key, uint32_t value) {
+  //calc has value using key (which is the string name)
+  uint32_t hash = jenkins_one_at_a_time_hash((uint8_t*)key, strlen(key)) % HASH_TABLE_SIZE;
+
+  //acquire lock
+  //rwlock_acquire_writelock(&table_lock);
   
+  //look for the hash that was calculated
+  hashRecord* existing_record = hash_table[hash];
+  //if the record exists, update
+  if(existing_record != NULL){
+    //find the actual record with the key, the hash_table entry can have multiple records with the same hash
+    while(existing_record->name != key){
+      existing_record = existing_record->next;
+    }
+    //only value will need to be updated, key cannot
+    existing_record->salary = value;
+    //call insert and make a new node with the existing record
+    list_insert(create_node(existing_record));
+    return 0;
+  }
+
+  /*
   hashRecord **ptr = &hash_table[hash];
   while (*ptr) {
     if ((*ptr)->hash == hash) {
@@ -46,6 +66,7 @@ int hash_insert(int key, hashRecord value) {
     }
     ptr = &((*ptr)->next);
   }
+  */
   
   hashRecord *new_record = (hashRecord *)malloc(sizeof(hashRecord));
   if (!new_record) {
@@ -53,12 +74,14 @@ int hash_insert(int key, hashRecord value) {
     return -1;  // Memory allocation failure
   }
   
-  *new_record = value;
   new_record->hash = hash;
-  new_record->next = hash_table[hash];
+  strncpy(new_record->name, key, sizeof(new_record->name) - 1);
+  new_record->name[sizeof(new_record->name) - 1] = '\0';
+  new_record->salary= value;
+  new_record->next = NULL; //a new record cannot have any collisions yet
   hash_table[hash] = new_record;
   
-  rwlock_release_writelock(&table_lock);
+  //rwlock_release_writelock(&table_lock);
   list_insert(create_node(new_record));
   return 0;  // Inserted new entry
 }

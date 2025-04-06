@@ -74,7 +74,7 @@ void print_table(){
     // list of records sorted by hash values 
     node* curr = list.head; 
     while (curr) {
-        fprintf(output, "%d,%s,%d", curr->records->hash, curr->records->name, curr->records->salary);
+        fprintf(output, "%d,%s,%d", curr->record->hash, curr->record->name, curr->record->salary);
         curr = curr->next;
     } 
 

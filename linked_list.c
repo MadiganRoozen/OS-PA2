@@ -36,7 +36,13 @@ node* list_insert(node* new) {
     while (curr && curr->record->hash < hash) {
         curr = curr->next;
     }
+    //if the current node hash is equal to the hash we are looking for, a node needs to be updated
     if (curr && curr->record->hash == hash) {
+        //while the node we are on has a different key than the new node key
+        while(curr->record->name != new->record->name){
+            //move to the next entry in the hash_table record
+            curr->record = curr->record->next;
+        }
         // Update existing node
         curr->record = new->record;
         //get rid of new node
