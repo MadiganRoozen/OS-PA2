@@ -9,11 +9,15 @@ typedef struct hash_struct
   struct hash_struct *next;
 } hashRecord;
 
+typedef struct list{
+  hashRecord *head;
+} hash_table;
+
 void init_hashtable();
 
 uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length);
 
-int hash_insert(int key, hashRecord value);
+int hash_insert(char* key, uint32_t value);
 
 int hash_delete(int key);
 
