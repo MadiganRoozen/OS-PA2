@@ -28,6 +28,7 @@ int main(int argc, char *argv[]){
   }
 
   // initalize hash linked list and thread manager 
+  output_init();
   init_hashtable();
   init_thread_manager(thread_count);
 

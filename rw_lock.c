@@ -22,6 +22,7 @@ void rwlock_acquire_readlock(rwlock_t *lock) {
 	    sem_wait(&lock->writelock);
 
     sem_post(&lock->lock);
+    output_lock_status("READ LOCK ACQUIRED");
 }
 
 void rwlock_release_readlock(rwlock_t *lock) {
@@ -32,14 +33,17 @@ void rwlock_release_readlock(rwlock_t *lock) {
 	    sem_post(&lock->writelock);
 
     sem_post(&lock->lock);
+    output_lock_status("READ LOCK RELEASED");
 }
 
 void rwlock_acquire_writelock(rwlock_t *lock) {
     sem_wait(&lock->writelock);
+    output_lock_status("WRITE LOCK ACQUIRED");
 }
 
 void rwlock_release_writelock(rwlock_t *lock) {
     sem_post(&lock->writelock);
+    output_lock_status("WRITE LOCK RELEASED");
 }
 
 
