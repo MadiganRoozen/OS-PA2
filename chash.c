@@ -8,7 +8,7 @@
 int main(int argc, char *argv[]){
 
   char* filename = argv[1];
-  if(argc > 2){
+  if(argc < 2){
     printf("Usage: must include executable and input file");
     return 0;
   }
@@ -19,6 +19,10 @@ int main(int argc, char *argv[]){
   }
   // read in commands 
   FILE *input = fopen(filename, "r");
+  if (input == NULL) {
+    printf("Error opening file");
+    return 0;
+  }
 
   // read in number of threads -- first line 
   char first[20];

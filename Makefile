@@ -2,8 +2,9 @@ CC = gcc
 CFLAGS = -Wall -Wextra -pthread
 
 TARGET = chash
-SRCS = chash.c hash_table.c linked_list.c output.c rw_lock.c thread_manager.c 
+SRCS = chash.c hash_table.c output.c rw_lock.c thread_manager.c 
 OBJS = $(SRCS:.c=.o)
+INPUT = commands.txt
 
 all: $(TARGET)
 
@@ -17,4 +18,4 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 run: all
-	./$(TARGET)
+	./$(TARGET) $(INPUT)

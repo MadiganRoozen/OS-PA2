@@ -40,14 +40,16 @@ void execute_commands(char *cmd) {
     } 
     else if (strcmp(command, "delete") == 0) {
         // hash value for the key and call delete.
-        uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
-        hash_delete(key_hash);
+        //uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
+        //hash_delete(key_hash);
+        hash_delete(name);
         output_write_command("DELETE", name, salary);
     } 
     else if (strcmp(command, "search") == 0) {
         //  hash value for the key and call search.
-        uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
-        hashRecord *result = hash_search(key_hash);
+        //uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
+        //hashRecord *result = hash_search(key_hash);
+        hash_search(name);
         output_write_command("SEARCH", name, salary);
        
     } 

@@ -77,7 +77,6 @@ void print_table(){
         curr = curr->next;
     } 
 
-    fclose(output);
     pthread_mutex_unlock(&output_lock);
 }
 
