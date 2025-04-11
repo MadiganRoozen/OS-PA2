@@ -35,6 +35,7 @@ void execute_commands(char *cmd) {
     
     if (strcmp(command, "insert") == 0) {
         //  hash table insert function 
+        printf("inserting %s\n", name);
         hash_insert(name, (uint32_t)salary);
         output_write_command("INSERT", name, salary);
     } 
@@ -42,6 +43,7 @@ void execute_commands(char *cmd) {
         // hash value for the key and call delete.
         //uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
         //hash_delete(key_hash);
+        printf("deleting %s\n", name);
         hash_delete(name);
         output_write_command("DELETE", name, salary);
     } 
@@ -49,6 +51,7 @@ void execute_commands(char *cmd) {
         //  hash value for the key and call search.
         //uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
         //hashRecord *result = hash_search(key_hash);
+        printf("searching %s\n", name);
         hash_search(name);
         output_write_command("SEARCH", name, salary);
        
@@ -79,6 +82,7 @@ void *process_command(void *arg) {
     return NULL;
 }
 
+/*
 // Create a thread for each enqueued command, wait for them to finish, and then clean up.
 void start_threads() {
     pthread_t *threads = malloc(command_count * sizeof(pthread_t));
@@ -101,6 +105,46 @@ void start_threads() {
         pthread_join(threads[i], NULL);
     }
     
+    free(threads);
+    free(command_array);
+    command_array = NULL;
+}
+*/
+
+// Helper lambda to run threads for a given command type
+void run_phase(const char *type, pthread_t* threads) {
+    int thread_index = 0;
+    for (int i = 0; i < command_count; i++) {
+        if (strncmp(command_array[i], type, strlen(type)) == 0) {
+            int ret = pthread_create(&threads[thread_index], NULL, process_command, (void *)command_array[i]);
+            if (ret != 0) {
+                fprintf(stderr, "Error: pthread_create failed for command %d\n", i);
+                exit(EXIT_FAILURE);
+            }
+            thread_index++;
+        }
+    }
+    // Join only the threads that were created for this phase
+    for (int i = 0; i < thread_index; i++) {
+        pthread_join(threads[i], NULL);
+    }
+}
+
+void start_threads() {
+    pthread_t *threads = malloc(command_count * sizeof(pthread_t));
+    if (threads == NULL) {
+        fprintf(stderr, "Error: Memory allocation for threads failed.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Run all inserts first
+    run_phase("insert", threads);
+    // Then deletes
+    run_phase("delete",threads);
+    // Then any other command (search, print, etc.)
+    run_phase("search",threads);
+    run_phase("print",threads);
+
     free(threads);
     free(command_array);
     command_array = NULL;
