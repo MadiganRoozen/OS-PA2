@@ -6,6 +6,8 @@ typedef struct rwlock_t {
     int num_readers;
 } rwlock_t;
 
+extern rwlock_t table_lock;
+
 //set up reader-writer lock
 void rwlock_init(rwlock_t *lock);
 

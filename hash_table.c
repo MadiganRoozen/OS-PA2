@@ -51,7 +51,7 @@ int hash_insert(char* key, uint32_t value) {
   uint32_t hash = jenkins_one_at_a_time_hash((uint8_t*)key, strlen(key));
 
   //try to find the record
-  hashRecord *existing_record = hash_search(key);
+  //hashRecord *existing_record = hash_search(key);
 
   rwlock_acquire_writelock(&table_lock);
   hashRecord *cur = list.head;
@@ -66,11 +66,25 @@ int hash_insert(char* key, uint32_t value) {
     return 0;
   }
 
+  hashRecord* existing_record = NULL;
+  while (cur != NULL) {
+    if (cur->hash == hash) {
+      existing_record = cur;
+      break; //found
+    }
+    if (cur->hash > hash) {
+      existing_record = NULL;
+      break;
+    }
+    cur = cur->next;
+  }
+  printf("exisitng record is %p\n", (void*)existing_record);
+
   if(existing_record == NULL){
     //make new node and add it to the list
     hashRecord* new = create_record(hash, key, value);
 
-    if(list.head->hash > new->hash){
+    if(list.head != NULL && list.head->hash > new->hash){
       hashRecord *old_head = list.head;
       list.head = new;
       new->next = old_head;
@@ -78,7 +92,8 @@ int hash_insert(char* key, uint32_t value) {
       rwlock_release_writelock(&table_lock);
       return 0;
     }
-
+    
+    cur = list.head;
     while(cur->next != NULL && cur->next->hash < new->hash){
       cur = cur->next;
     }
@@ -157,3 +172,4 @@ hashRecord* hash_search(char* key) {
   rwlock_release_readlock(&table_lock);
   return NULL; //not found
 }
+

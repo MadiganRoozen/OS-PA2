@@ -36,30 +36,30 @@ void execute_commands(char *cmd) {
     if (strcmp(command, "insert") == 0) {
         //  hash table insert function 
         printf("inserting %s\n", name);
-        hash_insert(name, (uint32_t)salary);
         output_write_command("INSERT", name, salary);
+        hash_insert(name, (uint32_t)salary);
     } 
     else if (strcmp(command, "delete") == 0) {
         // hash value for the key and call delete.
         //uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
         //hash_delete(key_hash);
         printf("deleting %s\n", name);
-        hash_delete(name);
         output_write_command("DELETE", name, salary);
+        hash_delete(name);
     } 
     else if (strcmp(command, "search") == 0) {
         //  hash value for the key and call search.
         //uint32_t key_hash = jenkins_one_at_a_time_hash((uint8_t*)name, strlen(name));
         //hashRecord *result = hash_search(key_hash);
         printf("searching %s\n", name);
-        hash_search(name);
         output_write_command("SEARCH", name, salary);
+        hash_search(name);
        
     } 
     else if (strcmp(command, "print") == 0) {
         // Print the entire table.
-        print_table();
         output_write_command("PRINT", "", 0);
+        print_table();
     }
 }
 

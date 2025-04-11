@@ -16,13 +16,15 @@ int lock_releases = 0;
 static pthread_mutex_t output_lock = PTHREAD_MUTEX_INITIALIZER;
 
 // prepare output file to write in 
-void output_init(){
+void output_init(int threads){
     output = fopen("output.txt", "w");
     
     // in case file won't open 
     if (output == NULL){
         printf("'output.txt' not found");
     }
+    fprintf(output, "Running %d threads\n", threads);
+    fflush(output);
 }
 
 // getting timestamp in microseconds
@@ -70,16 +72,17 @@ void output_condition_variables(char* signal){
 
 // prints just table 
 void print_table(){
+    rwlock_acquire_readlock(&table_lock);
     pthread_mutex_lock(&output_lock);
-
     // list of records sorted by hash values 
     hashRecord* curr = list.head; 
     while (curr) {
-        fprintf(output, "%d,%s,%d\n", curr->hash, curr->name, curr->salary);
+        fprintf(output, "%u,%s,%d\n", curr->hash, curr->name, curr->salary);
         curr = curr->next;
     } 
 
     pthread_mutex_unlock(&output_lock);
+    rwlock_release_readlock(&table_lock);
 }
 
 // final print

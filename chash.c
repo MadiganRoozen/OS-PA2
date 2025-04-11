@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
   fgets(first, sizeof(first), input);
 
   // initalize hash linked list and thread manager 
-  output_init();
+  output_init(thread_count);
   init_hashtable();
   init_thread_manager(command_lines);
 
