@@ -70,7 +70,7 @@ int hash_insert(char* key, uint32_t value) {
       rwlock_release_writelock(&table_lock);
       return 0;
     }
-    while(cur->next->hash < new->hash || cur->next == NULL){
+    while(cur->next != NULL && cur->next->hash < new->hash){
       cur = cur->next;
     }
     hashRecord* old_next = cur->next;

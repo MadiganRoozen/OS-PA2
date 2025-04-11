@@ -5,6 +5,8 @@
 #include "rw_lock.h"
 #include "output.h"
 
+extern rwlock_t table_lock;
+
 int main(int argc, char *argv[]){
 
   char* filename = argv[1];
@@ -25,26 +27,39 @@ int main(int argc, char *argv[]){
   }
 
   // read in number of threads -- first line 
-  char first[20];
+  char first[300];
   int thread_count = 0;
   if (fgets(first, sizeof(first), input)) {
     sscanf(first, "threads,%d,0", &thread_count);
   }
 
+  // read how many commands for initalizing 
+  int command_lines = 0;
+  while (fgets(first, sizeof(first), input)) {
+    command_lines++;
+  }
+
+  // rewind so we can go back and enqueue them later 
+  rewind(input);
+  fgets(first, sizeof(first), input);
+
   // initalize hash linked list and thread manager 
   output_init();
   init_hashtable();
-  init_thread_manager(thread_count);
+  init_thread_manager(command_lines);
 
   //reader-writer lock for the function to use while executing commands
   //all threads should share this one lock. When they try to do an insert or a delete they should try to acquire the writelock. When they do a search they should acquire the readlock
-  rwlock_t* lock;
-  rwlock_init(lock);
+  // rwlock_t* lock;
+  rwlock_init(&table_lock);
+
 
   // get rest of commands 
   while (fgets(first, sizeof(first), input)) {
-    char *cmd = strdup(first);
-    enqueue_command(cmd);
+    if (strlen(first) > 1) {
+      char *cmd = strdup(first);
+      enqueue_command(cmd);
+    }
   }
 
   // start threads -- thread_manager 

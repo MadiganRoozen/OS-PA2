@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include "sys/time.h"
 #include <string.h>
 #include <pthread.h>
@@ -24,18 +26,18 @@ void output_init(){
 }
 
 // getting timestamp in microseconds
-long long get_time() {
+uint64_t get_time() {
     struct timeval te;
     gettimeofday(&te, NULL); // get current time
-    long long microseconds = (te.tv_sec * 1000000) + te.tv_usec; // calculate milliseconds
+    uint64_t microseconds = ((uint64_t)te.tv_sec * 1000000) + te.tv_usec; // calculate milliseconds
     return microseconds;
   }
 
 // writes out command as executed -- thread manager 
 void output_write_command(char* cmd, char* name, int salary){
     pthread_mutex_lock(&output_lock);
-    int time = get_time();
-    fprintf(output, "%d,%s,%s,%d\n", time, cmd, name, salary);
+    uint64_t time = get_time();
+    fprintf(output, "%" PRIu64 ",%s,%s,%d\n", time, cmd, name, salary);
     fflush(output);
     pthread_mutex_unlock(&output_lock);
 }
@@ -43,8 +45,8 @@ void output_write_command(char* cmd, char* name, int salary){
 // write out when locks are acquired + released -- rw_lock
 void output_lock_status(char* status){
     pthread_mutex_lock(&output_lock);
-    int time = get_time();
-    fprintf(output, "%d,%s\n", time, status);
+    uint64_t time = get_time();
+    fprintf(output, "%" PRIu64 ",%s\n", time, status);
     fflush(output);
     pthread_mutex_unlock(&output_lock);
 
@@ -60,8 +62,8 @@ void output_lock_status(char* status){
 // write out when an operation is waiting on a CV  + when it's signaling 
 void output_condition_variables(char* signal){
     pthread_mutex_lock(&output_lock);
-    int time = get_time();
-    fprintf(output, "%d,%s\n", time, signal);
+    uint64_t time = get_time();
+    fprintf(output, "%" PRIu64 ",%s\n", time, signal);
     fflush(output);
     pthread_mutex_unlock(&output_lock);
 }
